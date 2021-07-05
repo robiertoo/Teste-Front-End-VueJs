@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conversor de Moedas</title>
+</head>
+<body>
+    <div id="app">
+        <input type='number' v-model='input' @keyup='convertValue' autofocus/>
+        <div>
+            <label>De: </label>
+            <select @change='convertValue' v-model='from'>
+                <option v-for='currency in currencyArray' :value='currency.id' v-text='currency.name'></option>
+            </select>
+        </div>
+        <div>
+            <label>Para: </label>
+            <select @change='convertValue' v-model='to'>
+                <option v-for='currency in currencyArray' :value='currency.id' v-text='currency.name'></option>
+            </select>
+        </div>
+
+        <div>
+            <h1>De {{ currencyArray[from].name }} para {{ currencyArray[to].name }} = {{ convertedValue }}</h1>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+    <script>
+        const convertValue = (value, iof_value, fx_value, fx_rate) => {
+            return (value - iof_value - fx_value) * fx_rate;
+        }
+
+        let app = new Vue({
+            el: '#app',
+            data() {
+                return {
+                    message: 'Hello Vue!',
+                    currencyArray: [
+                        {
+                            id: 0,
+                            name: 'Dolar',
+                            abbrev: 'USD',
+                            toReal: 5.2164,
+                        },
+                        {
+                            id: 1,
+                            name: 'Euro',
+                            abbrev: 'EUR',
+                            toReal: 6.3970,
+                            toDollar: 1.2206,
+                        },
+                        {
+                            id: 2,
+                            name: 'Real',
+                            abbrev: 'BRL',
+                            toDollar: 1.2206,
+                        },
+                    ],
+                    input: '',
+                    from: 0,
+                    to: 1,
+                    convertedValue: 0,
+                    iof_value: 0.011,
+                    fx_value: 0.010,
+                }
+            }, 
+            methods: {
+                convertValue: function() { 
+                    let auxValue;
+                    const { from, to, input, iof_value, fx_value, currencyArray } = this;
+                    
+                    if(input < 1) return this.convertedValue = 0;
+                    if(from === to) return this.convertedValue = 1;
+
+                    if(from == 0) {
+                        auxValue = to == 1 
+                        ? 1 / currencyArray[1].toDollar 
+                        : currencyArray[0].toReal ; 
+                    } else if(from === 1) {
+                        if(to == 0) auxValue = currencyArray[1].toDollar;
+                        else if (to == 2) auxValue = currencyArray[1].toReal;
+                    } else {
+                        if(to == 0) auxValue = 1 / currencyArray[0].toReal;
+                        else if(to == 1) auxValue = 1 / currencyArray[1].toReal;
+                    }
+
+                    return this.convertedValue = convertValue(input, iof_value, fx_value, auxValue);                    
+                }
+            }
+        })
+    </script>
+</body>
+</html>
