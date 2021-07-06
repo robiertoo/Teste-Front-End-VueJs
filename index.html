@@ -7,7 +7,7 @@
     <title>Conversor de Moedas</title>
     <link href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css" rel="stylesheet">
 </head>
-<body class='bg-green-600'>
+<body class='bg-gradient-to-r from-blue-500 to-green-700'>
     <style>
         input[type="number"]::-webkit-outer-spin-button, 
         input[type="number"]::-webkit-inner-spin-button {
@@ -20,27 +20,31 @@
     </style>
     <div id="app" class=''>
         <div class='flex justify-center items-center w-screen h-screen'>
-            <div class='md:h-1/2 md:w-1/2 bg-white p-10 rounded-lg'>
-                <div class='h-1/3'>
-                    <input type='number' v-model='input' @keyup='convertValue' autofocus placeholder='Insira o valor a ser convertido:' class='placeholder-green-900  text-center w-full text-2xl p-6 bg-green-100 border-green-900 rounded-sm focus:border-green-600 focus:ring-2 focus:ring-green-500 focus:outline-none' />
+            <div class='h-3/5 mx-1  md:h-1/2 md:w-1/2 bg-white p-10 rounded-xl shadow-lg'>
+                <div class='h-1/4'>
+                    <p class='text-5xl text-blue-500 text-center font-black'>CONVERSOR DE MOEDAS</p>
                 </div>
-                <div class='h-1/3 flex flex-column text-4xl'>
+                <div class='h-1/4'>
+                    <input type='number' v-model='input' @keyup='convertValue' autofocus placeholder='Insira o valor a ser convertido:' 
+                    class='placeholder-blue-900  text-center w-full text-lg md:text-2xl p-6 bg-blue-100 border-blue-900 rounded-sm 
+                    focus:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:outline-none' />
+                </div>
+                <div class='h-1/4 flex flex-column text-4xl'>
                     <div class='w-1/2 flex justify-center items-center'>
-                        <label>De: </label>
+                        <label class='text-xl text-blue-500'>De: </label>
                         <select @change='convertValue' v-model='from'>
-                            <option v-for='currency in currencyArray' :value='currency.id' v-text='currency.name'></option>
+                            <option v-for='currency in currencyArray' :value='currency.id' v-text='currency.name' :disabled='currency.id == to'></option>
                         </select>
                     </div>
                     <div class='w-1/2 flex justify-center items-center'>
-                        <label>Para: </label>
+                        <label class='text-xl text-green-700'>Para: </label>
                         <select @change='convertValue' v-model='to'>
-                            <option v-for='currency in currencyArray' :value='currency.id' v-text='currency.name'></option>
+                            <option v-for='currency in currencyArray' :value='currency.id' v-text='currency.name' :disabled='currency.id == from'></option>
                         </select>
                     </div>
                 </div>
-                <div class='h-1/3 flex justify-center items-center text-center text-5xl'>
-                    <!-- <h1>De {{ currencyArray[from].name }} para {{ currencyArray[to].name }} = {{ convertedValue }}</h1> -->
-                    <h1>{{ convertedValue }}</h1>
+                <div class='h-1/4 flex justify-center items-center text-center text-5xl'>
+                    <h1 class='border-b-2 border-blue-400'><span class='text-xl'>{{ currencyArray[to].abbrev }}</span> {{ parseFloat(convertedValue).toFixed(2).replace('.', ',') }}</h1>
                 </div>
             </div>
         </div>
@@ -91,7 +95,7 @@
                     const { from, to, input, iof_value, fx_value, currencyArray } = this;
                     
                     if(input < 1) return this.convertedValue = 0;
-                    if(from === to) return this.convertedValue = 1;
+                    if(from === to) return this.convertedValue = input;
 
                     if(from == 0) {
                         auxValue = to == 1 
@@ -105,7 +109,7 @@
                         else if(to == 1) auxValue = 1 / currencyArray[1].toReal;
                     }
 
-                    return this.convertedValue = convertValue(input, iof_value, fx_value, auxValue);                    
+                    return this.convertedValue = convertValue(input, iof_value * input , fx_value * input, auxValue);                    
                 }
             }
         })
